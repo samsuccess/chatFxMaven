@@ -8,11 +8,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
     private List<ClientHandler> clients;
-    private AuthService authService;
+
+    //    private AuthService authService;
+    private DataBaseAuthService dbAuthService;
+
+    public DataBaseAuthService getDbAuthService() {
+        return dbAuthService;
+    }
 
     public Server() {
         clients = new CopyOnWriteArrayList<>();
-        authService = new SimpleAuthService();
+//        authService = new SimpleAuthService();
+        dbAuthService = new DataBaseAuthService();
         ServerSocket server = null;
         Socket socket = null;
         final int PORT = 8189;
@@ -73,9 +80,9 @@ public class Server {
         broadcastClientList();
     }
 
-    public AuthService getAuthService() {
-        return authService;
-    }
+//    public AuthService getAuthService() {
+//        return authService;
+//    }
 
     public boolean isLoginAuthenticated(String login) {
         for (ClientHandler c : clients) {

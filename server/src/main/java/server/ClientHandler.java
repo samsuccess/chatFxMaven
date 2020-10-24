@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.sql.SQLException;
 
 public class ClientHandler {
     DataInputStream in;
@@ -35,7 +36,7 @@ public class ClientHandler {
                             if (token.length < 4) {
                                 continue;
                             }
-                            boolean b = server.getAuthService()
+                            boolean b = server.getDbAuthService()
                                     .registration(token[1], token[2], token[3]);
                             if (b) {
                                 sendMsg("/regok");
@@ -49,8 +50,18 @@ public class ClientHandler {
                             if (token.length < 3) {
                                 continue;
                             }
-                            String newNick = server.getAuthService()
-                                    .getNicknameByLoginAndPassword(token[1], token[2]);
+                            String newNick = null;
+                            try {
+                                server.getDbAuthService().connect();
+                                server.getDbAuthService().clearTable();
+                                server.getDbAuthService().prepareAllStatements();
+                                server.getDbAuthService().fillDataBase();
+                                newNick = server.getDbAuthService().getNicknameByLoginAndPassword(token[1], token[2]);
+                            } catch (SQLException throwables) {
+                                throwables.printStackTrace();
+                            } catch (ClassNotFoundException e) {
+                                e.printStackTrace();
+                            }
                             if (newNick != null) {
                                 login = token[1];
                                 if (!server.isLoginAuthenticated(login)) {
@@ -95,6 +106,7 @@ public class ClientHandler {
                     server.unsubscribe(this);
                     System.out.println("Client disconnected " + socket.getRemoteSocketAddress());
                     try {
+                        server.getDbAuthService().disconnect();
                         socket.close();
                         in.close();
                         out.close();

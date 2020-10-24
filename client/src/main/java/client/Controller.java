@@ -117,7 +117,7 @@ public class Controller implements Initializable {
                             regController.addMessageTextArea("Регистрация прошла успешно");
                         }
                         if (str.startsWith("/regno")) {
-                            regController.addMessageTextArea("Зарегистрироватся не удалось\n" +
+                            regController.addMessageTextArea("Зарегистрироваться не удалось\n" +
                                     " возможно такой логин или никнейм уже заняты");
                         }
 
