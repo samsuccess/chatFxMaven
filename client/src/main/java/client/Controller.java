@@ -18,7 +18,6 @@ import javafx.stage.Stage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
@@ -70,6 +69,7 @@ public class Controller implements Initializable {
             setTitle(String.format("[ %s ] - Балабол", nickname));
         }
         textArea.clear();
+
     }
 
     @Override
@@ -104,9 +104,6 @@ public class Controller implements Initializable {
                     while (true) {
                         String str = in.readUTF();
 
-                        if (str.startsWith("/timeout")) {
-                            break;
-                        }
                         if (str.startsWith("/authok ")) {
                             nickname = str.split("\\s")[1];
                             setAuthenticated(true);
@@ -117,8 +114,12 @@ public class Controller implements Initializable {
                             regController.addMessageTextArea("Регистрация прошла успешно");
                         }
                         if (str.startsWith("/regno")) {
-                            regController.addMessageTextArea("Зарегистрироваться не удалось\n" +
+                            regController.addMessageTextArea("Зарегистрироватся не удалось\n" +
                                     " возможно такой логин или никнейм уже заняты");
+                        }
+
+                        if (str.startsWith("/end")) {
+                            throw new RuntimeException("disconnected by timeout");
                         }
 
                         textArea.appendText(str + "\n");
@@ -141,14 +142,18 @@ public class Controller implements Initializable {
                                     }
                                 });
                             }
+                            //==============//
+                            if (str.startsWith("/yournickis ")) {
+                                nickname = str.split(" ")[1];
+                                setTitle(String.format("[ %s ] - Балабол", nickname));
+                            }
+                            //==============//
                         } else {
                             textArea.appendText(str + "\n");
                         }
                     }
-
-                } catch (EOFException eof) {
-                    System.out.println("Client disconnected by timeout");
-
+                } catch (RuntimeException e) {
+                    System.out.println(e.getMessage());
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {

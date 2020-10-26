@@ -8,18 +8,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
     private List<ClientHandler> clients;
-
-    //    private AuthService authService;
-    private DataBaseAuthService dbAuthService;
-
-    public DataBaseAuthService getDbAuthService() {
-        return dbAuthService;
-    }
+    private AuthService authService;
 
     public Server() {
         clients = new CopyOnWriteArrayList<>();
 //        authService = new SimpleAuthService();
-        dbAuthService = new DataBaseAuthService();
+        //==============//
+        if (!SQLHandler.connect()) {
+            throw new RuntimeException("Не удалось подключиться к БД");
+        }
+        authService = new DBAuthServise();
+        //==============//
+
         ServerSocket server = null;
         Socket socket = null;
         final int PORT = 8189;
@@ -36,6 +36,7 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
+            SQLHandler.disconnect();
             try {
                 socket.close();
             } catch (IOException e) {
@@ -53,6 +54,9 @@ public class Server {
         String message = String.format("[ %s ]: %s", sender.getNickname(), msg);
         for (ClientHandler c : clients) {
             c.sendMsg(message);
+            //==============//
+            SQLHandler.addMessage(sender.getNickname(),"null",msg,"once upon a time");
+            //==============//
         }
     }
 
@@ -61,6 +65,9 @@ public class Server {
         for (ClientHandler c : clients) {
             if (c.getNickname().equals(receiver)) {
                 c.sendMsg(message);
+                //==============//
+                SQLHandler.addMessage(sender.getNickname(),receiver,msg,"once upon a time");
+                //==============//
                 if (!sender.getNickname().equals(receiver)) {
                     sender.sendMsg(message);
                 }
@@ -80,9 +87,9 @@ public class Server {
         broadcastClientList();
     }
 
-//    public AuthService getAuthService() {
-//        return authService;
-//    }
+    public AuthService getAuthService() {
+        return authService;
+    }
 
     public boolean isLoginAuthenticated(String login) {
         for (ClientHandler c : clients) {
