@@ -16,14 +16,11 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -54,8 +51,11 @@ public class Controller implements Initializable {
     private RegController regController;
 
     private boolean authenticated;
-    private String login;
     private String nickname;
+
+    ///==============///
+    private String login;
+    ///==============///
 
     private void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
@@ -69,6 +69,9 @@ public class Controller implements Initializable {
         if (!authenticated) {
             nickname = "";
             setTitle("Балабол");
+            ///==============///
+            History.stop();
+            ///==============///
         } else {
             setTitle(String.format("[ %s ] - Балабол", nickname));
         }
@@ -112,6 +115,11 @@ public class Controller implements Initializable {
                             nickname = str.split("\\s")[1];
                             setAuthenticated(true);
 
+                            ///==============///
+                            textArea.appendText(History.getLast100LinesOfHistory(login));
+                            History.start(login);
+                            ///==============///
+
                             break;
                         }
 
@@ -126,7 +134,7 @@ public class Controller implements Initializable {
                         if (str.startsWith("/end")) {
                             throw new RuntimeException("disconnected by timeout");
                         }
-                        textArea.appendText(readHistory(login));
+
                         textArea.appendText(str + "\n");
                     }
 
@@ -155,6 +163,9 @@ public class Controller implements Initializable {
                             //==============//
                         } else {
                             textArea.appendText(str + "\n");
+                            ///==============///
+                            History.writeLine(str);
+                            ///==============///
                         }
                     }
                 } catch (RuntimeException e) {
@@ -178,36 +189,6 @@ public class Controller implements Initializable {
         }
     }
 
-    public String readHistory(String login) {
-        StringBuilder sb = new StringBuilder();
-        List<String> in;
-        try {
-            in = Files.readAllLines(Paths.get("client/history/history_" + login + ".txt"));
-            for (int i = 0; i < in.size(); i++) {
-                sb.append(in.get(i));
-            }
-            return sb.toString();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public void writeHistory(Character text) {
-        OutputStreamWriter out;
-        try {
-            out = new OutputStreamWriter(new FileOutputStream("client/history/history_" + login + ".txt", true));
-            try {
-                out.write(text);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");;
-        }
-    }
-
     public void sendMsg(ActionEvent actionEvent) {
         if (textField.getText().trim().length() == 0) {
             return;
@@ -228,6 +209,11 @@ public class Controller implements Initializable {
 
         String msg = String.format("/auth %s %s",
                 loginField.getText().trim(), passwordField.getText().trim());
+
+        ///==============///
+        login = loginField.getText().trim();
+        ///==============///
+
         try {
             out.writeUTF(msg);
             passwordField.clear();
