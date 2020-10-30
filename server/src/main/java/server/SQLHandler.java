@@ -38,6 +38,7 @@ public class SQLHandler {
                 "?, ?)");
 
 
+<<<<<<< HEAD
         psGetMessageForNick = connection.prepareStatement("SELECT (SELECT nickname FROM users WHERE id = sender),\n" +
                 "               (SELECT nickname FROM users WHERE id = receiver),\n" +
                 "               text,\n" +
@@ -46,6 +47,16 @@ public class SQLHandler {
                 "               WHERE sender = (SELECT id FROM users WHERE nickname= ?)\n" +
                 "               OR receiver = (SELECT id FROM users WHERE nickname= ?)\n" +
                 "               OR receiver = (SELECT id FROM users WHERE nickname='null')");
+=======
+        psGetMessageForNick = connection.prepareStatement("SELECT (SELECT nickname FROM users Where id = sender), \n" +
+                "       (SELECT nickname FROM users Where id = receiver),\n" +
+                "       text,\n" +
+                "       date \n" +
+                "FROM messages \n" +
+                "WHERE sender = (SELECT id FROM users WHERE nickname=?)\n" +
+                "OR receiver = (SELECT id FROM users WHERE nickname=?)\n" +
+                "OR receiver = (SELECT id FROM users WHERE nickname='null')");
+>>>>>>> origin/master
 
     }
 
@@ -89,6 +100,7 @@ public class SQLHandler {
         }
     }
 
+<<<<<<< HEAD
 /**
  * метод добавления сообщения в БД
  * @param sender ник отправителя
@@ -96,6 +108,21 @@ public class SQLHandler {
  * @param text текст сообщения
  * @param date дата и время сообщения в текстовом виде
  * */
+=======
+    /*
+     * метод добавления сообщения в БД
+     *
+     * @param sender   ник отправителя
+     * @param receiver ник получателя "null" если всем пользователям
+     * @param text     текст сообщения
+     * @param date     дата и время сообщения в текстовом виде
+     */
+
+    public static void clearTable() throws SQLException {
+        psClearTable.executeUpdate("DELETE FROM students;");
+    }
+
+>>>>>>> origin/master
     public static boolean addMessage(String sender, String receiver, String text, String date) {
         try {
             psAddMessage.setString(1, sender);
@@ -109,6 +136,7 @@ public class SQLHandler {
         }
     }
 
+<<<<<<< HEAD
     /**
      * метод извлечения сообщений из БД
      * Извлекаются все сообщения пользователя с ником nick,
@@ -116,6 +144,16 @@ public class SQLHandler {
      * @param nick ник пользователя, сообщения которого извлекаются
      * @return возвращает сроку сформированную из всех сообщений, которые должен увидеть данный пользователь
      * */
+=======
+    /*
+     * метод извлечения сообщений из БД
+     * Извлекаются все сообщения пользователя с ником nick,
+     * отправленные им и приходящие к нему
+     *
+     * @param nick ник пользователя, сообщения которого извлекаются
+     * @return возвращает сроку сформированную из всех сообщений, которые должен увидеть данный пользователь
+     */
+>>>>>>> origin/master
     public static String getMessageForNick(String nick) {
         StringBuilder sb = new StringBuilder();
 
@@ -130,8 +168,13 @@ public class SQLHandler {
                 String text = rs.getString(3);
                 String date = rs.getString(4);
                 //всем сообщение
+<<<<<<< HEAD
                 if (receiver.equals("null")) {
                     sb.append(String.format("%s: %s\n", sender, text));
+=======
+                if (receiver == "NULL") {
+                    sb.append(String.format("%s : %s\n", sender, text));
+>>>>>>> origin/master
                 } else {
                     sb.append(String.format("[ %s ] private [ %s ]: %s\n", sender, receiver, text));
                 }
@@ -140,7 +183,11 @@ public class SQLHandler {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+<<<<<<< HEAD
         System.out.println(sb);
+=======
+
+>>>>>>> origin/master
         return sb.toString();
     }
 
@@ -162,5 +209,8 @@ public class SQLHandler {
         }
 
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 }
