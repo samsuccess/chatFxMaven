@@ -16,11 +16,14 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -51,6 +54,7 @@ public class Controller implements Initializable {
     private RegController regController;
 
     private boolean authenticated;
+    private String login;
     private String nickname;
 
     private void setAuthenticated(boolean authenticated) {
@@ -107,6 +111,7 @@ public class Controller implements Initializable {
                         if (str.startsWith("/authok ")) {
                             nickname = str.split("\\s")[1];
                             setAuthenticated(true);
+
                             break;
                         }
 
@@ -121,7 +126,7 @@ public class Controller implements Initializable {
                         if (str.startsWith("/end")) {
                             throw new RuntimeException("disconnected by timeout");
                         }
-
+                        textArea.appendText(readHistory(login));
                         textArea.appendText(str + "\n");
                     }
 
@@ -170,6 +175,36 @@ public class Controller implements Initializable {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public String readHistory(String login) {
+        StringBuilder sb = new StringBuilder();
+        List<String> in;
+        try {
+            in = Files.readAllLines(Paths.get("client/history/history_" + login + ".txt"));
+            for (int i = 0; i < in.size(); i++) {
+                sb.append(in.get(i));
+            }
+            return sb.toString();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void writeHistory(Character text) {
+        OutputStreamWriter out;
+        try {
+            out = new OutputStreamWriter(new FileOutputStream("client/history/history_" + login + ".txt", true));
+            try {
+                out.write(text);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");;
         }
     }
 

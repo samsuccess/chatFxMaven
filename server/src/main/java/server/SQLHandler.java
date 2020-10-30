@@ -131,7 +131,7 @@ public class SQLHandler {
                 String date = rs.getString(4);
                 //всем сообщение
                 if (receiver.equals("null")) {
-                    sb.append(String.format("%s : %s\n", sender, text));
+                    sb.append(String.format("%s: %s\n", sender, text));
                 } else {
                     sb.append(String.format("[ %s ] private [ %s ]: %s\n", sender, receiver, text));
                 }
@@ -140,7 +140,7 @@ public class SQLHandler {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        System.out.println(sb);
         return sb.toString();
     }
 
