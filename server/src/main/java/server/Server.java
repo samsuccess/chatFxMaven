@@ -55,7 +55,7 @@ public class Server {
         for (ClientHandler c : clients) {
             c.sendMsg(message);
             //==============//
-            SQLHandler.addMessage(sender.getNickname(),"null",msg,"once upon a time");
+//            SQLHandler.addMessage(sender.getNickname(),"null",msg,"once upon a time");
             //==============//
         }
     }
@@ -66,7 +66,7 @@ public class Server {
             if (c.getNickname().equals(receiver)) {
                 c.sendMsg(message);
                 //==============//
-                SQLHandler.addMessage(sender.getNickname(),receiver,msg,"once upon a time");
+//                SQLHandler.addMessage(sender.getNickname(),receiver,msg,"once upon a time");
                 //==============//
                 if (!sender.getNickname().equals(receiver)) {
                     sender.sendMsg(message);

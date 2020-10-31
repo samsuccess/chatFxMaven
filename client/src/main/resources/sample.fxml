@@ -15,7 +15,7 @@
 
     <HBox VBox.vgrow="ALWAYS">
         <TextArea fx:id="textArea" HBox.hgrow="ALWAYS" editable="false"/>
-        <ListView fx:id="clientList" minWidth="60" visible="false" managed="false"
+        <ListView fx:id="clientList" minWidth="53" visible="false" managed="false"
         onMouseClicked="#clickClientList" onMouseReleased="#releasedMouseClientList"/>
     </HBox>
 
