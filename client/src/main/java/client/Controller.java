@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Controller implements Initializable {
     @FXML
@@ -45,6 +47,7 @@ public class Controller implements Initializable {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    ExecutorService service;
 
     private Stage stage;
     private Stage regStage;
@@ -104,8 +107,10 @@ public class Controller implements Initializable {
             socket = new Socket(IP_ADDRESS, PORT);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+            service = Executors.newFixedThreadPool(1);
+//  Я думаю достаточно одного открытого потока для работы чата;
 
-            new Thread(() -> {
+            service.execute(() -> {
                 try {
                     //цикл аутентификации
                     while (true) {
@@ -178,11 +183,12 @@ public class Controller implements Initializable {
                         socket.close();
                         in.close();
                         out.close();
+                        service.shutdown();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-            }).start();
+            });
 
         } catch (IOException e) {
             e.printStackTrace();

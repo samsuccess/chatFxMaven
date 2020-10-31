@@ -5,10 +5,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientHandler {
     DataInputStream in;
     DataOutputStream out;
+    ExecutorService service;
     Server server;
     Socket socket;
 
@@ -21,9 +24,12 @@ public class ClientHandler {
             this.socket = socket;
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+            service = Executors.newFixedThreadPool(1);
+//  Я думаю достаточно одного открытого потока для работы чата;
+
             System.out.println("Client connected " + socket.getRemoteSocketAddress());
 
-            new Thread(() -> {
+            service.execute(() -> {
                 try {
                     socket.setSoTimeout(120000);
                     //цикл аутентификации
@@ -98,11 +104,12 @@ public class ClientHandler {
                         socket.close();
                         in.close();
                         out.close();
+                        service.shutdown();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-            }).start();
+            });
 
         } catch (IOException e) {
             e.printStackTrace();
