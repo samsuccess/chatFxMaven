@@ -11,7 +11,6 @@ import java.util.concurrent.Executors;
 public class ClientHandler {
     DataInputStream in;
     DataOutputStream out;
-    ExecutorService service;
     Server server;
     Socket socket;
 
@@ -24,12 +23,11 @@ public class ClientHandler {
             this.socket = socket;
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-            service = Executors.newFixedThreadPool(1);
-//  Я думаю достаточно одного открытого потока для работы чата;
 
+//            new Thread(()-> {
             System.out.println("Client connected " + socket.getRemoteSocketAddress());
 
-            service.execute(() -> {
+            server.getService().execute(() -> {
                 try {
                     socket.setSoTimeout(120000);
                     //цикл аутентификации
@@ -104,12 +102,12 @@ public class ClientHandler {
                         socket.close();
                         in.close();
                         out.close();
-                        service.shutdown();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             });
+//        }).start();
 
         } catch (IOException e) {
             e.printStackTrace();

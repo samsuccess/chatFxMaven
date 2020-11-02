@@ -5,13 +5,21 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
     private List<ClientHandler> clients;
     private AuthService authService;
+    ExecutorService service;
+
+    public ExecutorService getService() {
+        return service;
+    }
 
     public Server() {
         clients = new CopyOnWriteArrayList<>();
+        service = Executors.newCachedThreadPool();
 //        authService = new SimpleAuthService();
         //==============//
         if (!SQLHandler.connect()) {
@@ -37,6 +45,7 @@ public class Server {
             e.printStackTrace();
         } finally {
             SQLHandler.disconnect();
+            service.shutdown();
             try {
                 socket.close();
             } catch (IOException e) {
