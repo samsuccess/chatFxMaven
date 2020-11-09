@@ -7,8 +7,11 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 public class ClientHandler {
+
+    private static final Logger logger = Logger.getLogger(ClientHandler.class.getName());
     DataInputStream in;
     DataOutputStream out;
     Server server;
@@ -62,6 +65,7 @@ public class ClientHandler {
                                     sendMsg("/authok " + newNick);
                                     server.subscribe(this);
                                     socket.setSoTimeout(0);
+                                    logger.info("client "+ newNick + " connected "+socket.getRemoteSocketAddress());
                                     break;
                                 } else {
                                     sendMsg("С этим логином уже вошли в чат");
@@ -97,7 +101,8 @@ public class ClientHandler {
                     e.printStackTrace();
                 } finally {
                     server.unsubscribe(this);
-                    System.out.println("Client disconnected " + socket.getRemoteSocketAddress());
+                    logger.info("client disconnected "+socket.getRemoteSocketAddress());
+//                    System.out.println("Client disconnected " + socket.getRemoteSocketAddress());
                     try {
                         socket.close();
                         in.close();
