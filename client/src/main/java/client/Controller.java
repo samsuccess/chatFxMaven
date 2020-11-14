@@ -246,7 +246,7 @@ public class Controller implements Initializable {
             Parent root = fxmlLoader.load();
             regStage = new Stage();
             regStage.setTitle("Регистрация в чате Балабол");
-            regStage.setScene(new Scene(root, 400, 300));
+            regStage.setScene(new Scene(root, 200, 200));
             regStage.initModality(Modality.APPLICATION_MODAL);
 
             regController = fxmlLoader.getController();
